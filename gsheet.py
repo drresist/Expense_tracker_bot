@@ -4,7 +4,6 @@ import loguru
 from dotenv import load_dotenv
 import os
 
-
 load_dotenv()
 
 service_file = os.getenv("GOOGLE_SHEETS_KEY_FILE")
@@ -22,9 +21,8 @@ worksheet = sh.sheet1
 # Print the value in cell A1 of the first worksheet
 print(worksheet.get('A1'))
 
+
 def add_payment(category_type, category, amount):
     # Append payment data to the worksheet
-    worksheet.append_row([str(datetime.now()),category_type, category, amount])
+    worksheet.append_row([str(datetime.now()), category_type, category, amount])
     loguru.logger.info(f"Added payment: {category} - {amount}")
-
-
