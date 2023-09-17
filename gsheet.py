@@ -18,9 +18,6 @@ sh = gc.open_by_key(os.getenv('SHEET_ID'))
 # Open the first worksheet (sheet1) by name
 worksheet = sh.sheet1
 
-# Print the value in cell A1 of the first worksheet
-print(worksheet.get('A1'))
-
 
 def add_payment(category_type, category, amount):
     # Append payment data to the worksheet
