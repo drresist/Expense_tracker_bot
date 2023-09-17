@@ -34,4 +34,8 @@ def get_categories(category_type)->list:
     if category_type == "Expense":
         return worksheet.col_values(2)
 
+def add_category_income(name):
+    worksheet = sh.get_worksheet(1)
+    worksheet.append_row([name])
+    loguru.logger.info(f"Added category: {name}")
 

@@ -23,6 +23,13 @@ categories = {
     'Expense': ['Food', 'Transportation', 'Rent'],
 }
 
+@bot.message_handler(commands=['addcategory'])
+def add_category(message):
+    bot.send_message(message.chat.id, "Enter the name of the new category in next format. Example\n"
+                                      "Income:auto")
+    bot.register_next_step_handler(message, process_new_category)
+    bot.send_message(message.chat.id, "Enter the name of the new category:")
+
 @bot.message_handler(commands=['reload'])
 def reload_categories(message):
     categories['Income'] = get_categories('Income')
@@ -30,6 +37,8 @@ def reload_categories(message):
     logger.info("Reloaded categories")
     logger.info("New categories:")
     logger.info(categories)
+    bot.send_message(message.chat.id, "Reloaded categories\nNew categories: " + str(categories))
+
 
 
 
@@ -80,43 +89,6 @@ def handle_amount(message):
 
     user_data.clear()
 
-# Create a dictionary to store user-defined categories
-custom_categories = {}
-
-@bot.message_handler(commands=['addcategory'])
-def add_category(message):
-    bot.send_message(message.chat.id, "Enter the name of the new category in next format. Example\n"
-                                      "Income:auto")
-    bot.register_next_step_handler(message, process_new_category)
-    bot.send_message(message.chat.id, "Enter the name of the new category:")
-
-def process_new_category(message):
-    category_name = message.text
-    user_id = message.from_user.id
-
-    # Store the custom category for the user
-    custom_categories[user_id] = custom_categories.get(user_id, [])
-    custom_categories[user_id].append(category_name)
-
-    bot.send_message(message.chat.id, f"Category '{category_name}' added successfully!")
-
-# Modify the 'handle_category' function to include custom categories
-@bot.message_handler(func=lambda message: message.text in categories.get(user_data.get('category_type', ''), []) or message.text in custom_categories.get(message.from_user.id, []))
-def handle_category(message):
-    user_data['category'] = message.text
-    bot.send_message(message.chat.id, f"You selected: {user_data['category']}\n\nEnter the amount:")
-
-# Modify the 'view_categories' function to show custom categories
-@bot.message_handler(commands=['viewcategories'])
-def view_categories(message):
-    user_id = message.from_user.id
-    user_categories = custom_categories.get(user_id, [])
-
-    if user_categories:
-        categories_str = "\n".join(user_categories)
-        bot.send_message(message.chat.id, f"Your custom categories:\n{categories_str}")
-    else:
-        bot.send_message(message.chat.id, "You haven't added any custom categories yet.")
 
 @bot.message_handler(commands=['help'])
 def display_help(message):
