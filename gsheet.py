@@ -24,7 +24,7 @@ def add_payment(category_type, category, amount):
     worksheet.append_row([str(datetime.now()), category_type, category, amount])
     loguru.logger.info(f"Added payment: {category} - {amount}")
 
-def get_categories(category_type)->list:
+def get_categories(category_type):
     worksheet = sh.get_worksheet(1)
     loguru.logger.info(f"Getting categories: {category_type}")
     if category_type is None:
@@ -34,8 +34,10 @@ def get_categories(category_type)->list:
     if category_type == "Expense":
         return worksheet.col_values(2)
 
-def add_category_income(name):
-    worksheet = sh.get_worksheet(1)
-    worksheet.append_row([name])
-    loguru.logger.info(f"Added category: {name}")
-
+def get_summary():
+    worksheet = sh.get_worksheet(0)
+    loguru.logger.info(f"Getting summary")
+    values = worksheet.get("D2:D10000")
+    values = [int(value[0]) for value in values]
+    loguru.logger.info(f"Summary of : {values} is f{sum(values)}")
+    return sum(values)

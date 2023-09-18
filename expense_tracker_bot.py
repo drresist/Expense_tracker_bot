@@ -3,7 +3,7 @@ from telebot import types
 from loguru import logger
 import os
 from dotenv import load_dotenv
-from gsheet import add_payment, get_categories
+from gsheet import add_payment, get_categories, get_summary 
 
 load_dotenv()
 
@@ -23,12 +23,6 @@ categories = {
     'Expense': ['Food', 'Transportation', 'Rent'],
 }
 
-@bot.message_handler(commands=['addcategory'])
-def add_category(message):
-    bot.send_message(message.chat.id, "Enter the name of the new category in next format. Example\n"
-                                      "Income:auto")
-    bot.register_next_step_handler(message, process_new_category)
-    bot.send_message(message.chat.id, "Enter the name of the new category:")
 
 @bot.message_handler(commands=['reload'])
 def reload_categories(message):
@@ -40,6 +34,10 @@ def reload_categories(message):
     bot.send_message(message.chat.id, "Reloaded categories\nNew categories: " + str(categories))
 
 
+# Send summary of transactions
+@bot.message_handler(commands=['viewsummary'])
+def view_summary(message):
+    bot.send_message(message.chat.id, get_summary())
 
 
 @bot.message_handler(commands=['start'])
