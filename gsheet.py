@@ -29,7 +29,7 @@ def add_payment(category_type, category, amount):
 
 def get_categories(category_type):
     sh = open_spreadsheet()
-    worksheet = sh.get_worksheet(1)
+    worksheet = sh.get_worksheet(2)
     logger.info(f"Getting categories: {category_type}")
     
     if category_type is None:
