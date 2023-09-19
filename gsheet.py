@@ -42,7 +42,7 @@ def get_categories(category_type):
 def get_summary():
     sh = open_spreadsheet()
     worksheet = sh.get_worksheet(0)
-    logger.info(f"Getting summary")
+    loguru.logger.info("Getting summary")
     values = worksheet.get("D2:D10000")
     values = [int(value[0]) for value in values]
     summary = sum(values)
