@@ -8,23 +8,24 @@ from diagrams import create_expense_by_date_category
 
 load_dotenv()
 
+# Load the Telegram bot token from environment variables
 token = os.getenv('TOKEN')
 if token is None:
     raise RuntimeError("TOKEN is not set")
-# Replace 'YOUR_BOT_TOKEN' with your actual bot token
+
+# Initialize the Telegram bot
 bot = telebot.TeleBot(token)
 
-# Dictionary to store transaction data
+# Dictionary to store user data during interactions
 user_data = {}
 
 # Dictionary of categories for income and expense
-
 categories = {
     'Income': ['Salary', 'Freelance', 'Investment'],
     'Expense': ['Food', 'Transportation', 'Rent'],
 }
 
-
+# Command to reload categories
 @bot.message_handler(commands=['reload'])
 def reload_categories(message):
     categories['Income'] = get_categories('Income')
@@ -34,15 +35,12 @@ def reload_categories(message):
     logger.info(categories)
     bot.send_message(message.chat.id, "Reloaded categories\nNew categories: " + str(categories))
 
-
-# Send summary of transactions
+# Command to view transaction summary
 @bot.message_handler(commands=['viewsummary'])
 def view_summary(message):
     logger.info("Viewing summary")
 
-
-# Get diagramg
-# TODO: Optimise, have error with creatin not in main thread
+# Command to view statistics diagram
 @bot.message_handler(commands=['stat'])
 def stat(message):
     data = get_all_vals()
@@ -50,6 +48,7 @@ def stat(message):
     with open('expense_by_date_category.png', 'rb') as f:
         bot.send_photo(message.chat.id, f)
 
+# Command to start the bot
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -60,7 +59,7 @@ def start(message):
     bot.send_message(message.chat.id, "Welcome to the Expense Tracker Bot! "
                                       "Please choose an option:", reply_markup=markup)
 
-
+# Handle user choice of category type (Income or Expense)
 @bot.message_handler(func=lambda message: message.text in ["Income", "Expense"])
 def handle_choice(message):
     user_data['category_type'] = message.text
@@ -70,13 +69,13 @@ def handle_choice(message):
 
     bot.send_message(message.chat.id, f"Choose a category for {message.text.lower()}:", reply_markup=markup)
 
-
+# Handle user choice of category
 @bot.message_handler(func=lambda message: message.text in categories.get(user_data.get('category_type', ''), []))
 def handle_category(message):
     user_data['category'] = message.text
     bot.send_message(message.chat.id, f"You selected: {user_data['category']}\n\nEnter the amount:")
 
-
+# Handle user input of transaction amount
 @bot.message_handler(func=lambda message: not message.text.startswith('/'))
 def handle_amount(message):
     user_data['amount'] = message.text
@@ -93,11 +92,10 @@ def handle_amount(message):
         user_data['category'],
         user_data['amount']
     )
-    # TODO: add to sql record
 
     user_data.clear()
 
-
+# Command to display help
 @bot.message_handler(commands=['help'])
 def display_help(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -111,6 +109,6 @@ def display_help(message):
     commands_text = "Here are some commands you can use:"
     bot.send_message(message.chat.id, commands_text, reply_markup=markup)
 
-
+# Start the bot
 if __name__ == '__main__':
     bot.polling()
