@@ -4,3 +4,4 @@ venv/
 *.db
 creds/*
 .idea/
+.ruff_cache/
