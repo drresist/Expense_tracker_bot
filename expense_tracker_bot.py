@@ -3,7 +3,8 @@ from telebot import types
 from loguru import logger
 import os
 from dotenv import load_dotenv
-from gsheet import add_payment, get_categories, get_summary 
+from gsheet import add_payment, get_categories, get_all_vals
+from diagrams import create_expense_by_date_category
 
 load_dotenv()
 
@@ -37,8 +38,17 @@ def reload_categories(message):
 # Send summary of transactions
 @bot.message_handler(commands=['viewsummary'])
 def view_summary(message):
-    bot.send_message(message.chat.id, get_summary())
+    logger.info("Viewing summary")
 
+
+# Get diagramg
+# TODO: Optimise, have error with creatin not in main thread
+@bot.message_handler(commands=['stat'])
+def stat(message):
+    data = get_all_vals()
+    create_expense_by_date_category(data)
+    with open('expense_by_date_category.png', 'rb') as f:
+        bot.send_photo(message.chat.id, f)
 
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -95,7 +105,8 @@ def display_help(message):
     item_add_category = types.KeyboardButton("/addcategory")
     item_view_categories = types.KeyboardButton("/viewcategories")
     item_view_summary = types.KeyboardButton("/viewsummary")
-    markup.add(item_start, item_add_category, item_view_categories, item_view_summary)
+    reload = types.KeyboardButton("/reload")
+    markup.add(item_start, item_add_category, item_view_categories, item_view_summary, reload)
 
     commands_text = "Here are some commands you can use:"
     bot.send_message(message.chat.id, commands_text, reply_markup=markup)

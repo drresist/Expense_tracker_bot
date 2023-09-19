@@ -21,7 +21,7 @@ sh = gc.open_by_key(os.getenv('SHEET_ID'))
 def add_payment(category_type, category, amount):
     worksheet = sh.sheet1
     # Append payment data to the worksheet
-    worksheet.append_row([str(datetime.now()), category_type, category, amount])
+    worksheet.append_row([str(datetime.now()), category_type, category, int(amount)])
     loguru.logger.info(f"Added payment: {category} - {amount}")
 
 def get_categories(category_type):
@@ -41,3 +41,9 @@ def get_summary():
     values = [int(value[0]) for value in values]
     loguru.logger.info(f"Summary of : {values} is f{sum(values)}")
     return sum(values)
+
+def get_all_vals():
+    worksheet = sh.get_worksheet(0)
+    loguru.logger.info(f"Getting all values")
+    values = worksheet.get_all_values()
+    return values
