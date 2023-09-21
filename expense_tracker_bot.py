@@ -78,12 +78,14 @@ def handle_category(message):
 # Handle user input of transaction amount
 @bot.message_handler(func=lambda message: not message.text.startswith('/'))
 def handle_amount(message):
-    user_data['amount'] = message.text
-    transaction_info = f"Category: {user_data['category_type']}, " \
-                       f"Transaction: {user_data['category']}, " \
-                       f"Amount: {user_data['amount']}"
-    bot.send_message(message.chat.id, f"Transaction recorded:\n{transaction_info}")
-
+    try:
+        user_data['amount'] = message.text
+        transaction_info = f"Category: {user_data['category_type']}, " \
+                        f"Transaction: {user_data['category']}, " \
+                        f"Amount: {user_data['amount']}"
+        bot.send_message(message.chat.id, f"Transaction recorded:\n{transaction_info}")
+    except Error as e:
+        logger.warn(e)
     # Log the transaction
     logger.info(transaction_info)
 
@@ -111,4 +113,4 @@ def display_help(message):
 
 # Start the bot
 if __name__ == '__main__':
-    bot.polling()
+    bot.infinity_polling(timeout=10, long_polling_timeout = 5)
