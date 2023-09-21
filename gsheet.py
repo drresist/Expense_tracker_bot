@@ -26,7 +26,9 @@ def open_spreadsheet():
 def add_payment(category_type, category, amount):
     sh = open_spreadsheet()
     worksheet = sh.sheet1
-    row_data = [str(datetime.now()), category_type, category, int(amount)]
+    current_datetime = datetime.now()
+    formatted_date = current_datetime.strftime("%Y-%m-%d %H:%M:%S")  # Customize the date format as needed
+    row_data = [formatted_date, category_type, category, int(amount)]
     worksheet.append_row(row_data)
     logger.info(f"Added payment: {category} - {amount}")
 
