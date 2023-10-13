@@ -10,7 +10,7 @@ Follow these steps to set up and use the Expense Tracker Bot:
    Clone this repository to your local machine:
 
    ```
-   git clone https://github.com/yourusername/expense-tracker-bot.git
+   git clone https://github.com/drresist/expense-tracker-bot.git
    ```
 
 2. **Install Dependencies**
