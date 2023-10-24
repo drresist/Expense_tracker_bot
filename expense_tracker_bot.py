@@ -4,7 +4,7 @@ from loguru import logger
 import os
 from dotenv import load_dotenv
 from gsheet import add_payment, get_categories, get_all_vals
-from diagrams import create_expense_by_date_category
+from diagrams import create_stacked_bar_chart
 
 load_dotenv()
 
@@ -25,6 +25,7 @@ categories = {
     'Expense': ['Food', 'Transportation', 'Rent'],
 }
 
+
 # Command to reload categories
 @bot.message_handler(commands=['reload'])
 def reload_categories(message):
@@ -35,18 +36,16 @@ def reload_categories(message):
     logger.info(categories)
     bot.send_message(message.chat.id, "Reloaded categories\nNew categories: " + str(categories))
 
-# Command to view transaction summary
-@bot.message_handler(commands=['viewsummary'])
-def view_summary(message):
-    logger.info("Viewing summary")
 
 # Command to view statistics diagram
 @bot.message_handler(commands=['stat'])
 def stat(message):
     data = get_all_vals()
-    create_expense_by_date_category(data)
-    with open('expense_by_date_category.png', 'rb') as f:
-        bot.send_photo(message.chat.id, f)
+    create_stacked_bar_chart(data)
+    img = open('month_expense.png', 'rb')
+    bot.send_photo(message.chat.id, img)
+    img.close()
+
 
 # Command to start the bot
 @bot.message_handler(commands=['start'])
@@ -59,6 +58,7 @@ def start(message):
     bot.send_message(message.chat.id, "Welcome to the Expense Tracker Bot! "
                                       "Please choose an option:", reply_markup=markup)
 
+
 # Handle user choice of category type (Income or Expense)
 @bot.message_handler(func=lambda message: message.text in ["Income", "Expense"])
 def handle_choice(message):
@@ -69,23 +69,26 @@ def handle_choice(message):
 
     bot.send_message(message.chat.id, f"Choose a category for {message.text.lower()}:", reply_markup=markup)
 
+
 # Handle user choice of category
 @bot.message_handler(func=lambda message: message.text in categories.get(user_data.get('category_type', ''), []))
 def handle_category(message):
     user_data['category'] = message.text
     bot.send_message(message.chat.id, f"You selected: {user_data['category']}\n\nEnter the amount:")
 
+
 # Handle user input of transaction amount
 @bot.message_handler(func=lambda message: not message.text.startswith('/'))
 def handle_amount(message):
+    transaction_info = ""
     try:
         user_data['amount'] = message.text
         transaction_info = f"Category: {user_data['category_type']}, " \
-                        f"Transaction: {user_data['category']}, " \
-                        f"Amount: {user_data['amount']}"
+                           f"Transaction: {user_data['category']}, " \
+                           f"Amount: {user_data['amount']}"
         bot.send_message(message.chat.id, f"Transaction recorded:\n{transaction_info}")
-    except Error as e:
-        logger.warn(e)
+    except Exception as e:
+        logger.warning(e)
     # Log the transaction
     logger.info(transaction_info)
 
@@ -96,6 +99,7 @@ def handle_amount(message):
     )
 
     user_data.clear()
+
 
 # Command to display help
 @bot.message_handler(commands=['help'])
@@ -111,6 +115,8 @@ def display_help(message):
     commands_text = "Here are some commands you can use:"
     bot.send_message(message.chat.id, commands_text, reply_markup=markup)
 
+
 # Start the bot
 if __name__ == '__main__':
-    bot.infinity_polling(timeout=10, long_polling_timeout = 5)
+    # create_expense_by_date_category(get_all_vals())
+    bot.infinity_polling(timeout=10, long_polling_timeout=5)
