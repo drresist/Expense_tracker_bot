@@ -27,7 +27,7 @@ def add_payment(category_type, category, amount):
     sh = open_spreadsheet()
     worksheet = sh.sheet1
     current_datetime = datetime.now()
-    formatted_date = current_datetime.strftime("%Y-%m-%d %H:%M:%S")  # Customize the date format as needed
+    formatted_date = current_datetime.strftime("%d.%m.%Y %H:%M:%S")  # Customize the date format as needed
     row_data = [formatted_date, category_type, category, int(amount)]
     worksheet.append_row(row_data)
     logger.info(f"Added payment: {category} - {amount}")
@@ -60,6 +60,6 @@ def get_summary():
 def get_all_vals():
     sh = open_spreadsheet()
     worksheet = sh.get_worksheet(0)
-    logger.info(f"Getting all values")
+    logger.info("Getting all values")
     values = worksheet.get_all_values()
     return values

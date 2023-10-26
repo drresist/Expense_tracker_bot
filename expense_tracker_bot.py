@@ -21,8 +21,8 @@ user_data = {}
 
 # Dictionary of categories for income and expense
 categories = {
-    'Income': ['Salary', 'Freelance', 'Investment'],
-    'Expense': ['Food', 'Transportation', 'Rent'],
+    'Income': [],
+    'Expense': [],
 }
 
 
@@ -118,5 +118,4 @@ def display_help(message):
 
 # Start the bot
 if __name__ == '__main__':
-    # create_expense_by_date_category(get_all_vals())
     bot.infinity_polling(timeout=10, long_polling_timeout=5)
